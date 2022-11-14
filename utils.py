@@ -23,6 +23,4 @@ class Utils:
         file_name = self.xlxs_path.split('.')[-2]
         with open(file_name +'_{i}_{j}_frames.pkl'.format(i = length, j = length - 10),'wb')as fpick:
             pickle.dump(motion, fpick)
-
-
-
+    
