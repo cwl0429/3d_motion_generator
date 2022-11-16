@@ -28,4 +28,5 @@ if __name__ == "__main__":
     file_name = "excel_input_test.xlsx"
     utils = Utils(file_name)
     utils.load_xlsx()
-    print(utils.combine_selected_motion())
+    data = utils.combine_selected_motion()
+    np.save("test.npy",data)

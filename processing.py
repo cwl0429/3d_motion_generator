@@ -33,8 +33,8 @@ class Processing:
         data = data.reshape(data.shape[0], int(data.shape[1]/3), 3)
         normal_data = []
         for i, frame in enumerate(data):
-            root = (frame[self.joint['rthigh']]+frame[self.joint['lthigh']])/2
-            data[i, self.joint['pelvis']] = root
+            root = (frame[joint['rthigh']]+frame[joint['lthigh']])/2
+            data[i, joint['pelvis']] = root
             normal_data.append([])
             for node in frame:
                 normal_data[-1].extend(node - root)
@@ -62,7 +62,7 @@ class Processing:
     def calculate_angle(self, fullbody):
         AngleList = np.zeros_like(fullbody)
         for i, frame in enumerate(fullbody):
-            for joint in self.jointConnect:
+            for joint in jointConnect:
                 v = frame[joint[0]:joint[0]+3] - frame[joint[1]:joint[1]+3]
                 AngleList[i][joint[0]:joint[0]+3] = list(self.get_angle(v))
         return AngleList
@@ -71,7 +71,7 @@ class Processing:
     def calculate_position(self, fullbody, TP):
         PosList = np.zeros_like(fullbody)
         for i, frame in enumerate(fullbody):
-            for joint in self.jointConnect:
+            for joint in jointConnect:
                 v = TP[joint[0]:joint[0]+3] - TP[joint[1]:joint[1]+3]
                 angles = frame[joint[0]:joint[0]+3]
                 root = PosList[i][joint[1]:joint[1]+3]

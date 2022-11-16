@@ -11,7 +11,7 @@ from visualize import AnimePlot
 
 class Inference:
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
+    processing = Processing()
     partList = ['leftarm', 'rightarm', 'leftleg', 'rightleg', 'torso']
     args_type = 'infilling'
     args_model = '1011_ChoreoMaster_Normal_train_angle_01_2010'
@@ -60,7 +60,7 @@ class Inference:
             print('No this type!!')
         return result.detach().cpu().numpy()
 
-    def combine(partDatas):
+    def combine(self, partDatas):
         torso = partDatas['torso']
         larm = partDatas['leftarm']
         lleg = partDatas['leftleg']
@@ -71,6 +71,7 @@ class Inference:
 
     def main(self, data):
         partDatas = {}
+        data = torch.tensor(data.astype("float32"))
         for part in self.partList:
             model = self.load_model(part)
             if part == 'torso':
@@ -86,8 +87,8 @@ class Inference:
             partDatas[part] = self.getResult(part_data, model, part)
         pred = self.combine(partDatas)
         
-        pred = Processing.calculate_position(pred, self.TPose)
-        gt = Processing.calculate_position(data, self.TPose)
+        pred = self.processing.calculate_position(pred, self.TPose)
+        gt = self.processing.calculate_position(data, self.TPose)
         if self.args_type == 'infilling':
             result = np.zeros_like(pred)
             ran = int(self.inp_len/2)
@@ -101,18 +102,21 @@ class Inference:
     '''
     def output(self):
         pass
-    if __name__ == '__main__':
-        visual = True
-        gt, pred = main()
-        # path = args.out.split('.')
-        path = "test"
-        with open(f'{path}.pkl', 'wb') as fpick:
-            pickle.dump(pred, fpick)
-        with open(f'{path}_ori.pkl', 'wb') as fpick:
-            pickle.dump(gt, fpick)
-        if visual:
-            figure = AnimePlot()
-            labels = ['Predicted', 'Ground Truth']
-            figure.set_fig(labels, path[0])
-            figure.set_data([pred, gt], 300)
-            figure.animate()
+if __name__ == '__main__':
+    
+    visual = True
+    inf = Inference()
+    npy = np.load("test.npy")
+    gt, pred = inf.main(npy)
+    # path = args.out.split('.')
+    path = "test"
+    with open(f'{path}.pkl', 'wb') as fpick:
+        pickle.dump(pred, fpick)
+    with open(f'{path}_ori.pkl', 'wb') as fpick:
+        pickle.dump(gt, fpick)
+    if visual:
+        figure = AnimePlot()
+        labels = ['Predicted', 'Ground Truth']
+        figure.set_fig(labels, path[0])
+        figure.set_data([pred, gt], 300)
+        figure.animate()
