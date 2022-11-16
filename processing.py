@@ -3,19 +3,22 @@ import numpy as np
 import pickle
 
 class Processing:
-    jointIndex = {"head":0, "neck":3, "rshoulder":6, "rarm":9, "rhand":12, 
+    def __init__(self) -> None:
+        self.jointIndex = {"head":0, "neck":3, "rshoulder":6, "rarm":9, "rhand":12, 
                 "lshoulder":15, "larm":18, "lhand":21, "pelvis":24, 
                 "rthigh":27, "rknee":30,"rankle":33,"lthigh":36, "lknee":39, "lankle":42}
 
-    joint = {"head":0, "neck":1, "rshoulder":2, "rarm":3, "rhand":4, 
-                    "lshoulder":5, "larm":6, "lhand":7, "pelvis":8, 
-                    "rthigh":9, "rknee":10,"rankle":11,"lthigh":12, "lknee":13, "lankle":14}
+        self.joint = {"head":0, "neck":1, "rshoulder":2, "rarm":3, "rhand":4, 
+                        "lshoulder":5, "larm":6, "lhand":7, "pelvis":8, 
+                        "rthigh":9, "rknee":10,"rankle":11,"lthigh":12, "lknee":13, "lankle":14}
 
-    jointChain = [["neck","pelvis"], ["head","neck"],  ["rshoulder", "neck"], ["rarm", "rshoulder"], ["rhand", "rarm"],
-                    ["rthigh", "pelvis"], ["rknee", "rthigh"], ["rankle", "rknee"],
-                    ["lshoulder", "neck"], ["larm", "lshoulder"], ["lhand", "larm"], 
-                    ["lthigh", "pelvis"], ["lknee", "lthigh"], ["lankle", "lknee"]]
+        self.jointChain = [["neck","pelvis"], ["head","neck"],  ["rshoulder", "neck"], ["rarm", "rshoulder"], ["rhand", "rarm"],
+                        ["rthigh", "pelvis"], ["rknee", "rthigh"], ["rankle", "rknee"],
+                        ["lshoulder", "neck"], ["larm", "lshoulder"], ["lhand", "larm"], 
+                        ["lthigh", "pelvis"], ["lknee", "lthigh"], ["lankle", "lknee"]]
     
+        self.jointConnect = [(self.jointIndex[joint[0]], self.jointIndex[joint[1]]) for joint in self.jointChain]
+
     def get_single_data(self, dir, filename, file):
         if dir != "":
             filepath = os.path.join("../Dataset", dir, filename, file)
@@ -26,13 +29,16 @@ class Processing:
             data = pickle.load(f)
         return data
 
-    def normalize(self, fullbody):
-        normal = np.zeros_like(fullbody)
-        hips = self.jointIndex['hips']
-        for i, frame in enumerate(fullbody):
-            for joint in self.jointIndex.values():
-                normal[i][joint:joint+3] = frame[joint:joint+3] - frame[hips:hips+3]
-        return normal
+    def normalize(self, data):
+        data = data.reshape(data.shape[0], int(data.shape[1]/3), 3)
+        normal_data = []
+        for i, frame in enumerate(data):
+            root = (frame[self.joint['rthigh']]+frame[self.joint['lthigh']])/2
+            data[i, self.joint['pelvis']] = root
+            normal_data.append([])
+            for node in frame:
+                normal_data[-1].extend(node - root)
+        return np.array(normal_data)
 
     def get_angle(self, v):
         axis_x = np.array([1,0,0])

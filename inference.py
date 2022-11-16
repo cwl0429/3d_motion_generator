@@ -12,22 +12,13 @@ from visualize import AnimePlot
 
 class Inference:
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--dataset", type=str, help="Dataset Dir", required=True) # e.g. Human3.6M/test_angle
-    parser.add_argument("-f", "--file", type=str, help="File name")                          
-    parser.add_argument("-v", "--visual", help="Visualize", action="store_true")
-    args = parser.parse_args()
     
     partList = ['leftarm', 'rightarm', 'leftleg', 'rightleg', 'torso']
-    dataset = args.dataset.split('/')[0]
-    dir = args.dataset.split('/')[1]
-    file = args.file
+    args_type = 'infilling'
     args_model = '1011_ChoreoMaster_Normal_train_angle_01_2010'
     inp_len = int(args_model.split('_')[-1][:2])
     out_len = int(args_model.split('_')[-1][-2:])
-    args_type = 'infilling'
     
-
     with open("./data/TPose/s_01_act_02_subact_01_ca_01.pickle", 'rb')as fpick:
         TPose = pickle.load(fpick)[0]
 
@@ -64,8 +55,6 @@ class Inference:
     def getResult(self, data, model, part):
         if part == 'torso':
             dim = 21
-        elif part == 'entire':
-            dim = 45
         else:
             dim = 18
         if self.args_type == 'infilling':
@@ -115,16 +104,18 @@ class Inference:
     '''
     def output(self):
         pass
-    # if __name__ == '__main__':
-    #     gt, pred = main()
-    #     path = args.out.split('.')
-    #     with open(f'{path[0]}.pkl', 'wb') as fpick:
-    #         pickle.dump(pred, fpick)
-    #     with open(f'{path[0]}_ori.pkl', 'wb') as fpick:
-    #         pickle.dump(gt, fpick)
-    #     if args.visual:
-    #         figure = AnimePlot()
-    #         labels = ['Predicted', 'Ground Truth']
-    #         figure.set_fig(labels, path[0])
-    #         figure.set_data([pred, gt], 300)
-    #         figure.animate()
+    if __name__ == '__main__':
+        visual = True
+        gt, pred = main()
+        # path = args.out.split('.')
+        path = "test"
+        with open(f'{path}.pkl', 'wb') as fpick:
+            pickle.dump(pred, fpick)
+        with open(f'{path}_ori.pkl', 'wb') as fpick:
+            pickle.dump(gt, fpick)
+        if visual:
+            figure = AnimePlot()
+            labels = ['Predicted', 'Ground Truth']
+            figure.set_fig(labels, path[0])
+            figure.set_data([pred, gt], 300)
+            figure.animate()

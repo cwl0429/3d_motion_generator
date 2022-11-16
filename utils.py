@@ -1,8 +1,10 @@
 import openpyxl
 import numpy as np
 import pickle
+from processing import Processing
 class Utils:
     dataset_path = './data/split_npy_with_sign/'
+    processing = Processing()
     def __init__(self, xlxs_path) -> None:
         self.xlxs_path = xlxs_path
     def load_xlsx(self):
@@ -14,13 +16,16 @@ class Utils:
             for anim in row:
                 data = np.load(self.dataset_path + anim)
                 if is_first_data != True:
-                    result = np.concatenate((result,data))
+                    motion = np.concatenate((motion,data))
                 else:
-                    result = data
+                    motion = data
                     is_first_data = False
-        length = (i+1) * 40
-        motion = np.array(result)
-        file_name = self.xlxs_path.split('.')[-2]
-        with open(file_name +'_{i}_{j}_frames.pkl'.format(i = length, j = length - 10),'wb')as fpick:
-            pickle.dump(motion, fpick)
+        motion = self.processing.normalize(motion)
+        motion = self.processing.calculate_angle(motion)
+        return motion
     
+if __name__ == "__main__":
+    file_name = "excel_input_test.xlsx"
+    utils = Utils(file_name)
+    utils.load_xlsx()
+    print(utils.combine_selected_motion())
