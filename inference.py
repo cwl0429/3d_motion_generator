@@ -1,6 +1,5 @@
 import pickle
-import numpy as np
-import argparse    
+import numpy as np   
 import os
 from processing import Processing
 import torch
@@ -28,7 +27,6 @@ class Inference:
             self.models[part] = self.load_model(part)
 
     def load_model(self, part):
-        # print(">>> Model loaded -->", part)
         path = os.path.join("model", self.args_model, part)
         model = torch.load(path + "/best.pth",map_location = self.DEVICE).to(self.DEVICE)
         model.eval()
@@ -44,7 +42,6 @@ class Inference:
             inp = torch.cat((result[:, -ran:, :], missing_data, motion[:, j+ ran : j + ran * 2, :]), 1)
             out, _,_ = model(inp, self.inp_len+self.out_len, self.inp_len+self.out_len)
             result = torch.cat((result, out[:, ran:2 * ran + self.out_len, :]), 1)
-            # result = torch.cat((result, motion[:, j+ran+out_len:j+ran+out_len+ran, :]), 1)
 
         tail = len(data) - len(result.view((-1,dim)))
         if tail > 0:
