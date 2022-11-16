@@ -98,17 +98,16 @@ class Inference:
     def output(self, save_path, visual = True):
         with open(f'{save_path}.pkl', 'wb') as fpick:
             pickle.dump(self.pred, fpick)
-        with open(f'{path}_ori.pkl', 'wb') as fpick:
+        with open(f'{save_path}_ori.pkl', 'wb') as fpick:
             pickle.dump(self.gt, fpick)
         if visual:
-            figure = AnimePlot()
+            figure = AnimePlot(10)
             labels = ['Predicted', 'Ground Truth']
-            figure.set_fig(labels, path)
+            figure.set_fig(labels, save_path)
             figure.set_data([self.pred, self.gt], 300)
             figure.animate()
         
 if __name__ == '__main__':
-    
     visual = True
     inf = Inference()
     npy = np.load("test.npy")
