@@ -85,38 +85,40 @@ class Inference:
             elif part == 'rightleg':
                 part_data = torch.cat((data[:, 3:6], data[:, 24:30], data[:, 36:39], data[:, 30:36]), axis=1)
             partDatas[part] = self.getResult(part_data, model, part)
-        pred = self.combine(partDatas)
+        self.pred = self.combine(partDatas)
         
-        pred = self.processing.calculate_position(pred, self.TPose)
-        gt = self.processing.calculate_position(data, self.TPose)
+        self.pred = self.processing.calculate_position(self.pred, self.TPose)
+        self.gt = self.processing.calculate_position(data, self.TPose)
         if self.args_type == 'infilling':
-            result = np.zeros_like(pred)
+            result = np.zeros_like(self.pred)
             ran = int(self.inp_len/2)
-            for j in range(0, len(gt)-ran+1, ran):
+            for j in range(0, len(self.gt)-ran+1, ran):
                 step = int(j / ran)
-                result[(ran + self.out_len) * step: (ran + self.out_len) * step + ran] = gt[j: j + ran]
-            gt = result
-        return gt, pred
+                result[(ran + self.out_len) * step: (ran + self.out_len) * step + ran] = self.gt[j: j + ran]
+            self.gt = result
     '''
     output .pkl and .gif
     '''
-    def output(self):
-        pass
+    def output(self, save_path, visual = True):
+        with open(f'{save_path}.pkl', 'wb') as fpick:
+            pickle.dump(self.pred, fpick)
+        with open(f'{path}_ori.pkl', 'wb') as fpick:
+            pickle.dump(self.gt, fpick)
+        if visual:
+            figure = AnimePlot()
+            labels = ['Predicted', 'Ground Truth']
+            figure.set_fig(labels, path)
+            figure.set_data([self.pred, self.gt], 300)
+            figure.animate()
+        
 if __name__ == '__main__':
     
     visual = True
     inf = Inference()
     npy = np.load("test.npy")
-    gt, pred = inf.main(npy)
-    # path = args.out.split('.')
-    path = "test"
-    with open(f'{path}.pkl', 'wb') as fpick:
-        pickle.dump(pred, fpick)
-    with open(f'{path}_ori.pkl', 'wb') as fpick:
-        pickle.dump(gt, fpick)
-    if visual:
-        figure = AnimePlot()
-        labels = ['Predicted', 'Ground Truth']
-        figure.set_fig(labels, path[0])
-        figure.set_data([pred, gt], 300)
-        figure.animate()
+    path = "data/result/test"
+
+    inf.main(npy)
+    inf.output(path)
+    
+    
