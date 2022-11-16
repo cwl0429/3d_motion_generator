@@ -4,9 +4,10 @@ import matplotlib.animation as animation
 from processing import joint, jointChain
 
 class AnimePlot():
-    def __init__(self):
+    def __init__(self, fps):
         self.fig = plt.figure()
         self.ax = []
+        self.fps = fps
     
     def set_fig(self, labels, save_path, scale = 2.5):
         self.scale = scale
@@ -61,7 +62,7 @@ class AnimePlot():
     def animate(self):
         self.anime = animation.FuncAnimation(self.fig, self.ani_update, self.frame_num, interval=1,init_func=self.ani_init)
         f = f"{self.save_path}.gif"
-        writergif = animation.PillowWriter(fps = 5)
+        writergif = animation.PillowWriter(fps = self.fps)
         self.anime.save(f, writer=writergif)
         # writervideo = animation.FFMpegWriter(fps = 10)
         # f = f"{self.save_path}.mp4"

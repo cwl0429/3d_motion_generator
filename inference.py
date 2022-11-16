@@ -5,10 +5,6 @@ from processing import Processing
 import torch
 from visualize import AnimePlot
 
-# python3 inference.py -t infilling -m new_Human3.6M_train_angle_01_1_1010 -d Human3.6M/test_angle -f s_09_act_02_subact_01_ca_01.pickle -o result/demo0923.pkl -v -p
-# python3 inference.py -t infilling -m seiha_Human3.6M_train_angle_01_1_1010 -d ChoreoMaster_Normal/test_angle -f d_act_1_ca_01.pkl -o result/1011_demo_0.pkl -v -p
-# python3 inference.py -t infilling -m 1011_ChoreoMaster_Normal_train_angle_01_2010 -d Tool/ -f NE6101076_1027_160_150_frames_angle.pkl -o result/tool_demo_1027.pkl -v -p
-
 class Inference:
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     processing = Processing()
