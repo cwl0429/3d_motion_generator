@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pickle
 from scipy.interpolate import interp1d
+
 jointIndex = {"head":0, "neck":3, "rshoulder":6, "rarm":9, "rhand":12, 
                 "lshoulder":15, "larm":18, "lhand":21, "pelvis":24, 
                 "rthigh":27, "rknee":30,"rankle":33,"lthigh":36, "lknee":39, "lankle":42}

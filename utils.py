@@ -1,6 +1,7 @@
 import openpyxl
 import numpy as np
 from processing import Processing
+
 class Utils:
     dataset_path = './data/split_npy_with_sign/'
     processing = Processing()
