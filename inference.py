@@ -95,7 +95,11 @@ class Inference:
     '''
     output .pkl and .gif
     '''
-    def output(self, save_path, visual = True):
+    def output(self, save_path, bpm, visual = True):
+        if(bpm != 90):
+            length = int(len(self.pred) * 90 / bpm)
+            self.pred = self.processing.interp_motion_length(self.pred, length)
+            self.gt = self.processing.interp_motion_length(self.gt, length)
         with open(f'{save_path}.pkl', 'wb') as fpick:
             pickle.dump(self.pred, fpick)
         with open(f'{save_path}_ori.pkl', 'wb') as fpick:

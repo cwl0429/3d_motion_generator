@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import pickle
-
+from scipy.interpolate import interp1d
 jointIndex = {"head":0, "neck":3, "rshoulder":6, "rarm":9, "rhand":12, 
                 "lshoulder":15, "larm":18, "lhand":21, "pelvis":24, 
                 "rthigh":27, "rknee":30,"rankle":33,"lthigh":36, "lknee":39, "lankle":42}
@@ -78,3 +78,13 @@ class Processing:
                 PosList[i][joint[0]:joint[0]+3] = np.array(list(self.get_position(v, angles)))+root
 
         return PosList
+    def interp_motion_length(self, motion, target_frames):
+        assert target_frames > 0
+        motion = np.transpose(motion)
+        motion_x = np.linspace(0, motion.shape[1] - 1, num=motion.shape[1], endpoint=True)
+        target_x = np.linspace(0, motion.shape[1] - 1, num=target_frames, endpoint=True)
+        motion_interp = np.zeros((motion.shape[0], target_frames))
+        for i, motion_y in enumerate(motion):
+            f = interp1d(motion_x, motion_y, kind='cubic')
+            motion_interp[i] = f(target_x)
+        return np.transpose(motion_interp)
