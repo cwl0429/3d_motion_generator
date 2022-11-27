@@ -130,7 +130,6 @@ dmypy.json
 .xlsx
 # motion data
 model/
-data/
 # pkl gif npy
 .pkl/
 .gif/

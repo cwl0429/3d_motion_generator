@@ -7,10 +7,12 @@ class MotionGenerator:
     def __init__(self) -> None:
         self.processing = Processing()
         self.inference = Inference()
+
     def load_xlsx(self, xlxs_path) -> None:
         utils = Utils(xlxs_path)
         self.bpm = utils.load_xlsx()
         self.data = utils.combine_selected_motion()
+        
     def generate_motion(self, save_path):
         self.inference.main(self.data)
         self.inference.output(save_path, self.bpm)
