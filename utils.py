@@ -3,7 +3,7 @@ import numpy as np
 from processing import Processing
 
 class Utils:
-    dataset_path = './data/split_npy_with_sign/'
+    dataset_path = './data/motions/'
     processing = Processing()
     def __init__(self, xlxs_path) -> None:
         self.xlxs_path = xlxs_path
@@ -15,12 +15,13 @@ class Utils:
         is_first_data = True
         for i, row in enumerate(self.ws.iter_rows(values_only=True, min_row=2)):
             for anim in row:
-                data = np.load(self.dataset_path + anim)
-                if is_first_data != True:
-                    motion = np.concatenate((motion,data))
-                else:
-                    motion = data
-                    is_first_data = False
+                if anim is not None:
+                    data = np.load(self.dataset_path + anim)
+                    if is_first_data != True:
+                        motion = np.concatenate((motion,data))
+                    else:
+                        motion = data
+                        is_first_data = False
         motion = self.processing.normalize(motion)
         motion = self.processing.calculate_angle(motion)
         return motion
