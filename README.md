@@ -17,5 +17,5 @@ git clone https://github.com/cwl0429/3d_motion_generator.git
 - Run tool
 
 ```
-python main.py -i input_path -p output_path  
+python main.py -i input_path -o output_path  
 ```

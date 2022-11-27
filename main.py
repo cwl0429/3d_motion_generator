@@ -16,12 +16,11 @@ class MotionGenerator:
         self.inference.output(save_path, self.bpm)
         
 if __name__ == "__main__":
+    # python main.py -i data/xlsx/frames_160_bpm_144.xlsx -o data/result/demo
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--save_path", type=str, help="Ouput file path", required=True, default = "result") # eg. data/result/test
     parser.add_argument("-i", "--xlsx_path", type=str, help="excel file name", required=True) # eg. data/xlsx/xxxxx.xlsx
+    parser.add_argument("-o", "--save_path", type=str, help="Ouput file path", required=True, default = "result") # eg. data/result/test
     args = parser.parse_args()
-    save_path = "./data/result/test"
-    xlxs_path = "./data/xlsx/frames_160_bpm_30.xlsx"
     motion_generator = MotionGenerator()
     motion_generator.load_xlsx(args.xlsx_path)
     motion_generator.generate_motion(args.save_path)
