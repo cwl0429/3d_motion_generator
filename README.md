@@ -14,7 +14,20 @@ This code was tested with Pytoch 1.12.1, CUDA 11.8, Python 3.8.13 and Ubuntu 20.
 git clone https://github.com/cwl0429/3d_motion_generator.git
 ```
 
-- 
+- Change dir
+
+```
+cd 3d_motion_generator
+```
+
+- Create model folder
+```
+mkdri model
+```
+
+- Download models
+
+- Create environment
 
 - Run tool
 
