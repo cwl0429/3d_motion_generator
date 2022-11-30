@@ -21,13 +21,20 @@ cd 3d_motion_generator
 ```
 
 - Create model folder
+
 ```
 mkdri model
 ```
 
 - Download models
 
+[model](https://drive.google.com/file/d/1iXDmnqapE7vur89ivaM4VFc69JwIWd2r/view?usp=share_link)
+
 - Create environment
+
+```
+conda env create -f environment.yml
+```
 
 - Run tool
 
