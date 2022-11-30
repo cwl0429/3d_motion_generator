@@ -23,7 +23,7 @@ cd 3d_motion_generator
 - Create model folder
 
 ```
-mkdri model
+mkdir model
 ```
 
 - Download models
