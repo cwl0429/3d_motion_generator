@@ -3,6 +3,9 @@
 ## Task Description
 Given a list of motions and a desired motion speed, the tool strings the motions together and converts them to plausible motion with specified speed through our model.
 
+## Demo
+
+![](https://i.imgur.com/nNGdxfm.gif)
 
 # Getting started
 ## Installation
@@ -40,7 +43,7 @@ conda env create -f environment_[linux/win].yml
 
 - Run tool
 
--i: input file path \n
+-i: input file path__ 
 -o: output file path 
 ```
 python main.py -i template_frames_160_bpm_90.xlsx -o template_frames_160_bpm_90  
