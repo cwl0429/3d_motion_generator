@@ -102,8 +102,6 @@ class Inference:
             self.gt = self.processing.interp_motion_length(self.gt, length)
         with open(f'{save_path}.pkl', 'wb') as fpick:
             pickle.dump(self.pred, fpick)
-        with open(f'{save_path}_ori.pkl', 'wb') as fpick:
-            pickle.dump(self.gt, fpick)
         if visual:
             figure = AnimePlot(10)
             labels = ['Predicted', 'Ground Truth']

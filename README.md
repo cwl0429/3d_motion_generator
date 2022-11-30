@@ -35,13 +35,13 @@ mkdir model
 - Create environment
 
 ```
-conda env create -f environment.yml
+conda env create -f environment_[linux/win].yml
 ```
 
 - Run tool
 
--i: input file path
+-i: input file path \n
 -o: output file path 
 ```
-python main.py -i template_frames_160_bpm_144.xlsx -o template_frames_160_bpm_144  
+python main.py -i template_frames_160_bpm_90.xlsx -o template_frames_160_bpm_90  
 ```
