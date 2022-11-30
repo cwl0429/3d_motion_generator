@@ -30,6 +30,8 @@ mkdri model
 
 [model](https://drive.google.com/file/d/1iXDmnqapE7vur89ivaM4VFc69JwIWd2r/view?usp=share_link)
 
+- Unzip models and put it in model
+
 - Create environment
 
 ```
@@ -37,7 +39,8 @@ conda env create -f environment.yml
 ```
 
 - Run tool
-
+-i: input file path
+-o: output file path 
 ```
-python main.py -i input_path -o output_path  
+python main.py -i template_frames_160_bpm_144.xlsx -o template_frames_160_bpm_144  
 ```
