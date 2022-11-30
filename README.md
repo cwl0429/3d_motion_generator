@@ -39,6 +39,7 @@ conda env create -f environment.yml
 ```
 
 - Run tool
+
 -i: input file path
 -o: output file path 
 ```
