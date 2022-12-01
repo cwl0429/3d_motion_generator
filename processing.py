@@ -11,7 +11,7 @@ joint = {"head":0, "neck":1, "rshoulder":2, "rarm":3, "rhand":4,
             "lshoulder":5, "larm":6, "lhand":7, "pelvis":8, "rthigh":9, 
             "rknee":10,"rankle":11,"lthigh":12, "lknee":13, "lankle":14}
 
-jointChain = [["neck","pelvis"], ["head","neck"],  ["rshoulder", "neck"], ["rarm", "rshoulder"], 
+jointChain = [["neck", "pelvis"], ["head", "neck"],  ["rshoulder", "neck"], ["rarm", "rshoulder"], 
                 ["rhand", "rarm"],["rthigh", "pelvis"], ["rknee", "rthigh"], ["rankle", "rknee"],
                 ["lshoulder", "neck"], ["larm", "lshoulder"], ["lhand", "larm"], 
                 ["lthigh", "pelvis"], ["lknee", "lthigh"], ["lankle", "lknee"]]
@@ -57,28 +57,27 @@ class Processing:
         x = r*angles[0]
         y = r*angles[1]
         z = r*angles[2]
-
         return  x,y,z
 
     def calculate_angle(self, fullbody):
         AngleList = np.zeros_like(fullbody)
         for i, frame in enumerate(fullbody):
             for joint in jointConnect:
-                v = frame[joint[0]:joint[0]+3] - frame[joint[1]:joint[1]+3]
-                AngleList[i][joint[0]:joint[0]+3] = list(self.get_angle(v))
+                v = frame[joint[0] : joint[0]+3]-frame[joint[1] : joint[1]+3]
+                AngleList[i][joint[0] : joint[0]+3] = list(self.get_angle(v))
         return AngleList
-
 
     def calculate_position(self, fullbody, TP):
         PosList = np.zeros_like(fullbody)
         for i, frame in enumerate(fullbody):
             for joint in jointConnect:
-                v = TP[joint[0]:joint[0]+3] - TP[joint[1]:joint[1]+3]
-                angles = frame[joint[0]:joint[0]+3]
-                root = PosList[i][joint[1]:joint[1]+3]
-                PosList[i][joint[0]:joint[0]+3] = np.array(list(self.get_position(v, angles)))+root
+                v = TP[joint[0] : joint[0]+3] - TP[joint[1] : joint[1]+3]
+                angles = frame[joint[0] : joint[0]+3]
+                root = PosList[i][joint[1] : joint[1]+3]
+                PosList[i][joint[0] : joint[0]+3] = np.array(list(self.get_position(v, angles))) + root
 
         return PosList
+
     def interp_motion_length(self, motion, target_frames):
         assert target_frames > 0
         motion = np.transpose(motion)

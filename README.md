@@ -40,6 +40,10 @@ mkdir model
 ```
 conda env create -f environment_[linux/win].yml
 ```
+or use pip__
+```
+pip install -r requirements.txt
+```
 
 - Run tool
 
