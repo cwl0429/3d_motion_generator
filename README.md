@@ -31,7 +31,7 @@ mkdir model
 
 - Download models
 
-[model](https://drive.google.com/file/d/1iXDmnqapE7vur89ivaM4VFc69JwIWd2r/view?usp=share_link)
+[model link](https://drive.google.com/file/d/1iXDmnqapE7vur89ivaM4VFc69JwIWd2r/view?usp=share_link)
 
 - Unzip models and put it in model
 
@@ -40,15 +40,18 @@ mkdir model
 ```
 conda env create -f environment_[linux/win].yml
 ```
-or use pip__
+
+or use pip to install modules
+
 ```
 pip install -r requirements.txt
 ```
 
 - Run tool
 
--i: input file path__ 
--o: output file path 
+`-i`: input file path <br/>
+`-o`: output file path 
+
 ```
 python main.py -i template_frames_160_bpm_90.xlsx -o template_frames_160_bpm_90  
 ```
