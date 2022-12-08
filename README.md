@@ -35,7 +35,7 @@ mkdir model
 
 - Unzip models and put it in model
 
-- intsall pytorch with proper cuda version
+- Intsall pytorch with proper cuda version
 
 ```
 # CUDA 10.2
@@ -48,7 +48,7 @@ conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cpuonly -c pytorch
 ```
 
-- install modules
+- Install modules
 
 ```
 pip install -r requirements.txt
