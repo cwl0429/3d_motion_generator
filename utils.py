@@ -7,10 +7,12 @@ class Utils:
     processing = Processing()
     def __init__(self, xlxs_path) -> None:
         self.xlxs_path = xlxs_path
+
     def load_xlsx(self):
         wb = openpyxl.load_workbook(self.xlxs_path)
         self.ws = wb.active
         return self.ws['A1'].value
+        
     def combine_selected_motion(self):
         is_first_data = True
         for i, row in enumerate(self.ws.iter_rows(values_only=True, min_row=2)):
