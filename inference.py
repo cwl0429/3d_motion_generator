@@ -1,8 +1,9 @@
-import pickle
-import numpy as np   
 import os
-from processing import Processing
+import pickle
 import torch
+import numpy as np   
+import time
+from processing import Processing
 from visualize import AnimePlot
 
 class Inference:
@@ -68,8 +69,10 @@ class Inference:
     def main(self, data):
         partDatas = {}
         data = torch.tensor(data.astype("float32"))
+        total_t = 0
         for part in self.partList:
             model = self.load_model(part)
+            st = time.time()
             if part == 'torso':
                 part_data = torch.cat((data[:, 0:9], data[:, 15:18], data[:, 24:30], data[:, 36:39]), axis=1)
             elif part == 'leftarm':
@@ -81,10 +84,17 @@ class Inference:
             elif part == 'rightleg':
                 part_data = torch.cat((data[:, 3:6], data[:, 24:30], data[:, 36:39], data[:, 30:36]), axis=1)
             partDatas[part] = self.getResult(part_data, model, part)
+            et = time.time()
+            elapsed_time = et - st
+            total_t += elapsed_time
+        st = time.time()
         self.pred = self.combine(partDatas)
-        
         self.pred = self.processing.calculate_position(self.pred, self.TPose)
         self.gt = self.processing.calculate_position(data, self.TPose)
+        et = time.time()
+        elapsed_time = et - st
+        total_t += elapsed_time
+        print('total execution time:', total_t, 'seconds')
         if self.args_type == 'infilling':
             result = np.zeros_like(self.pred)
             ran = int(self.inp_len/2)
@@ -103,11 +113,15 @@ class Inference:
         with open(f'{save_path}.pkl', 'wb') as fpick:
             pickle.dump(self.pred, fpick)
         if visual:
+            st = time.time()
             figure = AnimePlot(10)
             labels = ['Predicted', 'Ground Truth']
             figure.set_fig(labels, save_path)
             figure.set_data([self.pred, self.gt], 300)
             figure.animate()
+            et = time.time()
+            elapsed_time = et - st
+            print('visualization execution time:', elapsed_time, 'seconds')
         
 if __name__ == '__main__':
     visual = True
