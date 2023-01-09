@@ -106,6 +106,7 @@ class Inference:
     output .pkl and .gif
     '''
     def output(self, save_path, bpm, visual = True):
+        length = len(self.pred)
         if(bpm != 90):
             length = int(len(self.pred) * 90 / bpm)
             self.pred = self.processing.interp_motion_length(self.pred, length)
@@ -117,7 +118,7 @@ class Inference:
             figure = AnimePlot(10)
             labels = ['Predicted', 'Ground Truth']
             figure.set_fig(labels, save_path)
-            figure.set_data([self.pred, self.gt], 300)
+            figure.set_data([self.pred, self.gt], length)
             figure.animate()
             et = time.time()
             elapsed_time = et - st

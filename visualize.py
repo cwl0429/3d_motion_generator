@@ -55,7 +55,7 @@ class AnimePlot():
                     # right
                     self.ax[f].plot(x, y, z, color="#3498db")
                 else:
-                    #left
+                    # left
                     self.ax[f].plot(x, y, z, color="#e74c3c")
         self.time_text.set_text(str(i))
     
