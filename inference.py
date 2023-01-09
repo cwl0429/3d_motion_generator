@@ -90,7 +90,7 @@ class Inference:
             ran = int(self.inp_len/2)
             cur_pos = 0
             for i, len in enumerate(data_len):
-                result[cur_pos + i *ran :cur_pos+len + i *ran] = data[cur_pos:cur_pos+len]
+                result[cur_pos + i *ran :cur_pos+len + i *ran] = self.gt[cur_pos:cur_pos+len]
                 cur_pos += len
             self.gt = result
     '''
@@ -107,7 +107,7 @@ class Inference:
             figure = AnimePlot(10)
             labels = ['Predicted', 'Ground Truth']
             figure.set_fig(labels, save_path)
-            figure.set_data([self.pred, self.gt], 300)
+            figure.set_data([self.pred, self.gt], len(self.pred))
             figure.animate()
         
 if __name__ == '__main__':
