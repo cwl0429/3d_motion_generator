@@ -15,6 +15,7 @@ class Utils:
         
     def combine_selected_motion(self):
         is_first_data = True
+        motion_len = []
         for i, row in enumerate(self.ws.iter_rows(values_only=True, min_row=2)):
             for anim in row:
                 if anim is not None:
@@ -24,9 +25,10 @@ class Utils:
                     else:
                         motion = data
                         is_first_data = False
+                    motion_len.append(len(data))
         motion = self.processing.normalize(motion)
         motion = self.processing.calculate_angle(motion)
-        return motion
+        return motion, motion_len
     
 if __name__ == "__main__":
     file_name = "excel_input_test.xlsx"

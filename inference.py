@@ -28,7 +28,7 @@ class Inference:
         model.eval()
         return model
 
-    def infilling(self, dim, model, data):
+    def infilling(self, dim, model, data, data_len):
         motion = data.to(self.DEVICE)
         motion = motion.view((1, -1, dim))
         result = motion[:, :int(self.inp_len/2), :]
@@ -45,13 +45,13 @@ class Inference:
         result = result.view((-1,dim))
         return result
 
-    def getResult(self, data, model, part):
+    def getResult(self, data, model, part, data_len):
         if part == 'torso':
             dim = 21
         else:
             dim = 18
         if self.args_type == 'infilling':
-            result = self.infilling(dim, model, data)
+            result = self.infilling(dim, model, data, data_len)
         else:
             print('No this type!!')
         return result.detach().cpu().numpy()
@@ -65,7 +65,7 @@ class Inference:
         result = np.concatenate((torso[:, 0:9], rarm[:, -6:], torso[:, 9:12], larm[:, -6:], torso[:, 12:18], rleg[:, -6:], torso[:, 18:21], lleg[:, -6:]), 1)
         return result
 
-    def main(self, data):
+    def main(self, data, data_len):
         partDatas = {}
         data = torch.tensor(data.astype("float32"))
         for part in self.partList:
@@ -80,7 +80,7 @@ class Inference:
                 part_data = torch.cat((data[:, 3:6], data[:, 24:30], data[:, 36:39], data[:, 39:45]), axis=1)
             elif part == 'rightleg':
                 part_data = torch.cat((data[:, 3:6], data[:, 24:30], data[:, 36:39], data[:, 30:36]), axis=1)
-            partDatas[part] = self.getResult(part_data, model, part)
+            partDatas[part] = self.getResult(part_data, model, part, data_len)
         self.pred = self.combine(partDatas)
         
         self.pred = self.processing.calculate_position(self.pred, self.TPose)
