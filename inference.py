@@ -31,17 +31,17 @@ class Inference:
     def infilling(self, dim, model, data, data_len):
         motion = data.to(self.DEVICE)
         motion = motion.view((1, -1, dim))
-        result = motion[:, :int(self.inp_len/2), :]
         ran = int(self.inp_len/2)
-        for j in range(0, len(data)-ran, ran):
-            missing_data = torch.ones_like(motion[:, 0:self.out_len, :])
-            inp = torch.cat((result[:, -ran:, :], missing_data, motion[:, j+ ran : j + ran * 2, :]), 1)
-            out, _,_ = model(inp, self.inp_len+self.out_len, self.inp_len+self.out_len)
-            result = torch.cat((result, out[:, ran:2 * ran + self.out_len, :]), 1)
+        cur_pos = data_len[0]
+        result = motion[:, :cur_pos, :]
 
-        tail = len(data) - len(result.view((-1,dim)))
-        if tail > 0:
-            result = torch.cat((result, motion[:, -tail:, :]), 1)  
+        for len in data_len[1:]:
+            missing_data = torch.ones_like(motion[:, 0:self.out_len, :])
+            inp = torch.cat((result[:, -ran:, :], missing_data, motion[:, cur_pos: cur_pos+ran , :]), 1)
+            out, _,_ = model(inp, self.inp_len+self.out_len, self.inp_len+self.out_len)
+            result = torch.cat((result, out[:, ran:2 * ran, :], motion[:, cur_pos: cur_pos+len , :] ), 1)
+            cur_pos += len
+
         result = result.view((-1,dim))
         return result
 
@@ -88,9 +88,10 @@ class Inference:
         if self.args_type == 'infilling':
             result = np.zeros_like(self.pred)
             ran = int(self.inp_len/2)
-            for j in range(0, len(self.gt)-ran+1, ran):
-                step = int(j / ran)
-                result[(ran + self.out_len) * step: (ran + self.out_len) * step + ran] = self.gt[j: j + ran]
+            cur_pos = 0
+            for i, len in enumerate(data_len):
+                result[cur_pos + i *ran :cur_pos+len + i *ran] = data[cur_pos:cur_pos+len]
+                cur_pos += len
             self.gt = result
     '''
     output .pkl and .gif
