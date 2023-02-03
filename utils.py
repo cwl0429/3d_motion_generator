@@ -32,11 +32,11 @@ class Utils:
         assert len(motion_len) >= 2
         motion = self.processing.normalize(motion)
         motion = self.processing.calculate_angle(motion)
-        return motion, motion_len
+        return motion, motion_len, interpo_len
     
 if __name__ == "__main__":
     file_name = "template_frames_160_bpm_90.xlsx"
     utils = Utils(file_name)
     utils.load_xlsx()
-    data = utils.combine_selected_motion()
+    data, _, _ = utils.combine_selected_motion()
     np.save("test.npy",data)
