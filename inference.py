@@ -1,14 +1,16 @@
+import os
 import pickle
 import numpy as np   
-import os
-from processing import Processing
 import torch
+from processing import Processing
 from visualize import AnimePlot
-
+from model_joints import JointDefV3
+from model_loader import ModelLoader
 class Inference:
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     processing = Processing()
-    partList = ['leftarm', 'rightarm', 'leftleg', 'rightleg', 'torso']
+    joint_def = JointDefV3()
+    part_list = joint_def.part_list
     args_type = 'infilling'
     args_model = '1011_ChoreoMaster_Normal_train_angle_01_2010'
     inp_len = int(args_model.split('_')[-1][:2])
@@ -19,7 +21,7 @@ class Inference:
 
     def __init__(self):
         self.models = {}
-        for part in self.partList:
+        for part in self.part_list:
             self.models[part] = self.load_model(part)
 
     def load_model(self, part):
@@ -56,33 +58,15 @@ class Inference:
             print('No this type!!')
         return result.detach().cpu().numpy()
 
-    def combine(self, partDatas):
-        torso = partDatas['torso']
-        larm = partDatas['leftarm']
-        lleg = partDatas['leftleg']
-        rarm = partDatas['rightarm']
-        rleg = partDatas['rightleg']
-        result = np.concatenate((torso[:, 0:9], rarm[:, -6:], torso[:, 9:12], larm[:, -6:], torso[:, 12:18], rleg[:, -6:], torso[:, 18:21], lleg[:, -6:]), 1)
-        return result
-
     def main(self, data, data_len):
         partDatas = {}
         data = torch.tensor(data.astype("float32"))
-        for part in self.partList:
+        for part in self.part_list:
             model = self.load_model(part)
-            if part == 'torso':
-                part_data = torch.cat((data[:, 0:9], data[:, 15:18], data[:, 24:30], data[:, 36:39]), axis=1)
-            elif part == 'leftarm':
-                part_data = torch.cat((data[:, 3:9], data[:, 15:18], data[:, 24:27], data[:, 18:24]), axis=1)
-            elif part =='rightarm':
-                part_data = torch.cat((data[:, 3:9], data[:, 15:18], data[:, 24:27], data[:, 9:15]), axis=1)
-            elif part == 'leftleg':
-                part_data = torch.cat((data[:, 3:6], data[:, 24:30], data[:, 36:39], data[:, 39:45]), axis=1)
-            elif part == 'rightleg':
-                part_data = torch.cat((data[:, 3:6], data[:, 24:30], data[:, 36:39], data[:, 30:36]), axis=1)
+            part_data = self.joint_def.cat_torch(data)
             partDatas[part] = self.getResult(part_data, model, part, data_len)
-        self.pred = self.combine(partDatas)
-        
+            
+        self.pred = self.joint_def.combine_numpy(partDatas)
         self.pred = self.processing.calculate_position(self.pred, self.TPose)
         self.gt = self.processing.calculate_position(data, self.TPose)
         if self.args_type == 'infilling':
