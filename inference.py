@@ -48,10 +48,7 @@ class Inference:
         return result
 
     def getResult(self, data, model, part, data_len):
-        if part == 'torso':
-            dim = 21
-        else:
-            dim = 18
+        dim = self.joint_def.n_joints_part[part]
         if self.args_type == 'infilling':
             result = self.infilling(dim, model, data, data_len)
         else:
