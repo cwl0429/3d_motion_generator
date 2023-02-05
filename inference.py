@@ -67,16 +67,33 @@ class Inference:
         self.pred = self.joint_def.combine_numpy(part_datas)
         self.pred = self.processing.calculate_position(self.pred, self.TPose)
         self.gt = self.processing.calculate_position(data, self.TPose)
-        if self.args_type == 'infilling':
-            result = np.zeros_like(self.pred)
-            print(len(self.pred))
-            ran = 0
-            cur_pos = 0
-            for i, length in enumerate(data_len):
-                result[cur_pos+ran:cur_pos+length+ran] = self.gt[cur_pos:cur_pos+length]
-                ran += interpo_len[i]
-                cur_pos += length
-            self.gt = result
+        # interpolate to target frames
+        data_len = list(map(int,data_len))
+        interpo_len = list(map(int,interpo_len))
+        total_frame = sum(data_len) + sum(interpo_len)
+        pred = np.zeros([total_frame,45])
+        pred[:data_len[0]] = self.pred[:data_len[0]]
+        ran = 0
+        cur_pos = data_len[0]
+        for i, length in enumerate(data_len[1:]):
+            for model_len in self.models_len:
+                if int(model_len) > int(interpo_len[i]):
+                    break
+            pred_interpo = self.processing.interp_motion_length(self.pred[cur_pos:cur_pos+int(model_len)], interpo_len[i])
+            pred[cur_pos+ran:cur_pos+ran+interpo_len[i]] = pred_interpo
+            ran += interpo_len[i]
+            pred[cur_pos+ran:cur_pos+length+ran] = self.pred[cur_pos:cur_pos+length]
+            cur_pos += length
+        self.pred = pred
+        
+        gt = np.zeros_like(self.pred)
+        ran = 0
+        cur_pos = 0
+        for i, length in enumerate(data_len):
+            gt[cur_pos+ran:cur_pos+length+ran] = self.gt[cur_pos:cur_pos+length]
+            ran += interpo_len[i]
+            cur_pos += length
+        self.gt = gt
     '''
     output .pkl and .gif
     '''
