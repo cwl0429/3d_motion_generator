@@ -134,3 +134,6 @@ model/
 .pkl/
 .gif/
 .npy/
+
+# test file
+/tmp

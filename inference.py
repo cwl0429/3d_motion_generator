@@ -37,7 +37,6 @@ class Inference:
         ran = int(self.inp_len/2)
         cur_pos = data_len[0]
         result = motion[:, :cur_pos, :]
-        # TODO
         for i, length in enumerate(data_len[1:]):
             model, out_len = self.model_select(interpo_len[i])
             model = self.models['20']
@@ -45,11 +44,8 @@ class Inference:
             inp = torch.cat((result[:, -ran:, :], missing_data, motion[:, cur_pos: cur_pos+ran , :]), 1)
             out, _,_ = model[part](inp, self.inp_len+out_len, self.inp_len+out_len)
             out = out[:, ran:ran+interpo_len[i], :]
-            print(len(result[0]))
             result = torch.cat((result, out, motion[:, cur_pos: cur_pos+length , :] ), 1)
-            print(len(result[0]))
             cur_pos += length
-        print()
         result = result.view((-1,dim))
         return result
 

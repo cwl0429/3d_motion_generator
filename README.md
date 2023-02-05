@@ -60,5 +60,5 @@ pip install -r requirements.txt
 `-o`: output file path 
 
 ```
-python main.py -i template_frames_160_bpm_90.xlsx -o template_frames_160_bpm_90  
+python main.py -i template.xlsx -o template  
 ```
