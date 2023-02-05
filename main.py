@@ -11,10 +11,10 @@ class MotionGenerator:
     def load_xlsx(self, xlxs_path) -> None:
         utils = Utils(xlxs_path)
         self.bpm = utils.load_xlsx()
-        self.data, self.data_len ,self.data_len_interpo= utils.combine_selected_motion()
+        self.data, self.data_len ,self.data_len_interpo = utils.combine_selected_motion()
         
     def generate_motion(self, save_path):
-        self.inference.main(self.data, self.data_len)
+        self.inference.main(self.data, self.data_len, self.data_len_interpo)
         self.inference.output(save_path, self.bpm)
         
 if __name__ == "__main__":

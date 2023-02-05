@@ -15,7 +15,7 @@ class Utils:
         
     def combine_selected_motion(self):
         is_first_data = True
-        motion_len = []
+        motions_len = []
         interpo_len = []
         for i, row in enumerate(self.ws.iter_rows(values_only=True, min_row=2)):
             anim = row[0]
@@ -23,16 +23,15 @@ class Utils:
             if anim is not None:
                 data = np.load(self.dataset_path + anim)
                 if is_first_data != True:
-                    motion = np.concatenate((motion,data))
+                    motions = np.concatenate((motions,data))
                 else:
-                    motion = data
+                    motions = data
                     is_first_data = False
-                motion_len.append(len(data))
-
-        assert len(motion_len) >= 2
-        motion = self.processing.normalize(motion)
-        motion = self.processing.calculate_angle(motion)
-        return motion, motion_len, interpo_len
+                motions_len.append(len(data))
+        assert len(motions_len) >= 2
+        motions = self.processing.normalize(motions)
+        motions = self.processing.calculate_angle(motions)
+        return motions, motions_len, interpo_len
     
 if __name__ == "__main__":
     file_name = "template_frames_160_bpm_90.xlsx"

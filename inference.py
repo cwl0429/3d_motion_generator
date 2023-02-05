@@ -12,67 +12,74 @@ class Inference:
     joint_def = JointDefV3()
     part_list = joint_def.part_list
     args_type = 'infilling'
-    args_model = '1011_ChoreoMaster_Normal_train_angle_01_2010'
-    inp_len = int(args_model.split('_')[-1][:2])
-    out_len = int(args_model.split('_')[-1][-2:])
+    inp_len = 20
     
     with open("./data/TPose/s_01_act_02_subact_01_ca_01.pickle", 'rb')as fpick:
         TPose = pickle.load(fpick)[0]
 
     def __init__(self):
-        self.models = {}
-        for part in self.part_list:
-            self.models[part] = self.load_model(part)
+        model_name = ['1011_V3_ChoreoMaster_Normal_train_angle_01_2010','1229_V3_ChoreoMaster_Normal_train_angle_01_2020',
+                        '1011_V3_ChoreoMaster_Normal_train_angle_01_2030','1229_V3_ChoreoMaster_Normal_train_angle_01_2045', 
+                            '1011_V3_ChoreoMaster_Normal_train_angle_01_2060']
+        model_loader = ModelLoader(model_name, self.DEVICE, self.part_list)
+        self.models, self.models_len = model_loader.load_model()
 
-    def load_model(self, part):
-        path = os.path.join("model", self.args_model, part)
-        model = torch.load(path + "/best.pth",map_location = self.DEVICE).to(self.DEVICE)
-        model.eval()
-        return model
+    def model_select(self, target_len):
+        for model_len in self.models_len:
+            target_model = model_len
+            if int(model_len) > int(target_len):
+                break
+        return self.models[target_model], int(model_len)
 
-    def infilling(self, dim, model, data, data_len):
+    def infilling(self, part, dim, data, data_len, interpo_len):
         motion = data.to(self.DEVICE)
         motion = motion.view((1, -1, dim))
         ran = int(self.inp_len/2)
         cur_pos = data_len[0]
         result = motion[:, :cur_pos, :]
-
-        for len in data_len[1:]:
-            missing_data = torch.ones_like(motion[:, 0:self.out_len, :])
+        # TODO
+        for i, length in enumerate(data_len[1:]):
+            model, out_len = self.model_select(interpo_len[i])
+            model = self.models['20']
+            missing_data = torch.ones_like(motion[:, 0:out_len, :])
             inp = torch.cat((result[:, -ran:, :], missing_data, motion[:, cur_pos: cur_pos+ran , :]), 1)
-            out, _,_ = model(inp, self.inp_len+self.out_len, self.inp_len+self.out_len)
-            result = torch.cat((result, out[:, ran:2 * ran, :], motion[:, cur_pos: cur_pos+len , :] ), 1)
-            cur_pos += len
-
+            out, _,_ = model[part](inp, self.inp_len+out_len, self.inp_len+out_len)
+            out = out[:, ran:ran+interpo_len[i], :]
+            print(len(result[0]))
+            result = torch.cat((result, out, motion[:, cur_pos: cur_pos+length , :] ), 1)
+            print(len(result[0]))
+            cur_pos += length
+        print()
         result = result.view((-1,dim))
         return result
 
-    def getResult(self, data, model, part, data_len):
+    def get_result(self, data, part, data_len, interpo_len):
         dim = self.joint_def.n_joints_part[part]
         if self.args_type == 'infilling':
-            result = self.infilling(dim, model, data, data_len)
+            result = self.infilling(part, dim, data, data_len, interpo_len)
         else:
             print('No this type!!')
         return result.detach().cpu().numpy()
 
-    def main(self, data, data_len):
-        partDatas = {}
+    def main(self, data, data_len, interpo_len):
+        part_datas = {}
         data = torch.tensor(data.astype("float32"))
         for part in self.part_list:
-            model = self.load_model(part)
-            part_data = self.joint_def.cat_torch(data)
-            partDatas[part] = self.getResult(part_data, model, part, data_len)
+            part_data = self.joint_def.cat_torch(part, data)
+            part_datas[part] = self.get_result(part_data, part, data_len, interpo_len)
             
-        self.pred = self.joint_def.combine_numpy(partDatas)
+        self.pred = self.joint_def.combine_numpy(part_datas)
         self.pred = self.processing.calculate_position(self.pred, self.TPose)
         self.gt = self.processing.calculate_position(data, self.TPose)
         if self.args_type == 'infilling':
             result = np.zeros_like(self.pred)
-            ran = int(self.inp_len/2)
+            print(len(self.pred))
+            ran = 0
             cur_pos = 0
-            for i, len in enumerate(data_len):
-                result[cur_pos + i *ran :cur_pos+len + i *ran] = self.gt[cur_pos:cur_pos+len]
-                cur_pos += len
+            for i, length in enumerate(data_len):
+                result[cur_pos+ran:cur_pos+length+ran] = self.gt[cur_pos:cur_pos+length]
+                ran += interpo_len[i]
+                cur_pos += length
             self.gt = result
     '''
     output .pkl and .gif

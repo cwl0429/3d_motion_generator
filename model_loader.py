@@ -9,13 +9,15 @@ class ModelLoader:
 
     def load_model(self):
         models = {}
+        models_output_len = []
         for model_name in self.models_name:
             model_part = {}
             for part in self.part_list:
                 model_part[part] = self._load_model(model_name, part)
-                print(type(model_part[part]))
-            models[model_name] = model_part
-        return models
+                model_output_len = model_name.split('_')[-1][-2:]
+            models[model_output_len] = model_part.copy()
+            models_output_len.append(model_output_len)
+        return models, models_output_len
 
     def _load_model(self, model_name, part):
         path = os.path.join("model", model_name, part)
