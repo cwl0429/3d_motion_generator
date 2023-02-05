@@ -85,7 +85,7 @@ class Inference:
             pred[cur_pos+ran:cur_pos+length+ran] = self.pred[cur_pos:cur_pos+length]
             cur_pos += length
         self.pred = pred
-        
+
         gt = np.zeros_like(self.pred)
         ran = 0
         cur_pos = 0
