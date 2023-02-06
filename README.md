@@ -5,7 +5,7 @@ Given a list of motions and a desired motion speed, the tool strings the motions
 
 ## Demo
 
-![](https://i.imgur.com/nNGdxfm.gif)
+![](https://i.imgur.com/j7odZRJ.gif)
 
 # Getting started
 ## Installation
