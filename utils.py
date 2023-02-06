@@ -31,6 +31,7 @@ class Utils:
         assert len(motions_len) >= 2
         motions = self.processing.normalize(motions)
         motions = self.processing.calculate_angle(motions)
+        interpo_len[-1] = 0
         return motions, motions_len, interpo_len
     
 if __name__ == "__main__":
