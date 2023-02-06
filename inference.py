@@ -39,11 +39,10 @@ class Inference:
         result = motion[:, :cur_pos, :]
         for i, length in enumerate(data_len[1:]):
             model, out_len = self.model_select(interpo_len[i])
-            model = self.models['20']
             missing_data = torch.ones_like(motion[:, 0:out_len, :])
             inp = torch.cat((result[:, -ran:, :], missing_data, motion[:, cur_pos: cur_pos+ran , :]), 1)
             out, _,_ = model[part](inp, self.inp_len+out_len, self.inp_len+out_len)
-            out = out[:, ran:ran+interpo_len[i], :]
+            out = out[:, ran:ran+out_len, :]
             result = torch.cat((result, out, motion[:, cur_pos: cur_pos+length , :] ), 1)
             cur_pos += length
         result = result.view((-1,dim))
@@ -73,17 +72,21 @@ class Inference:
         total_frame = sum(data_len) + sum(interpo_len)
         pred = np.zeros([total_frame,45])
         pred[:data_len[0]] = self.pred[:data_len[0]]
-        ran = 0
-        cur_pos = data_len[0]
+        new_ran = 0
+        old_ran = 0
+        common_pos = data_len[0]
+        
         for i, length in enumerate(data_len[1:]):
             for model_len in self.models_len:
                 if int(model_len) > int(interpo_len[i]):
                     break
-            pred_interpo = self.processing.interp_motion_length(self.pred[cur_pos:cur_pos+int(model_len)], interpo_len[i])
-            pred[cur_pos+ran:cur_pos+ran+interpo_len[i]] = pred_interpo
-            ran += interpo_len[i]
-            pred[cur_pos+ran:cur_pos+length+ran] = self.pred[cur_pos:cur_pos+length]
-            cur_pos += length
+            pred_interpo = self.processing.interp_motion_length(self.pred[common_pos:common_pos+int(model_len)], interpo_len[i])
+            pred[common_pos+new_ran:common_pos+new_ran+interpo_len[i]] = pred_interpo
+            new_ran += interpo_len[i]
+            old_ran += int(model_len)
+            pred[common_pos+new_ran:common_pos+length+new_ran] = self.pred[common_pos+old_ran:common_pos+old_ran+length]
+            
+            common_pos += length
         self.pred = pred
 
         gt = np.zeros_like(self.pred)
@@ -105,7 +108,7 @@ class Inference:
         with open(f'{save_path}.pkl', 'wb') as fpick:
             pickle.dump(self.pred, fpick)
         if visual:
-            figure = AnimePlot(10)
+            figure = AnimePlot(5)
             labels = ['Predicted', 'Ground Truth']
             figure.set_fig(labels, save_path)
             figure.set_data([self.pred, self.gt], len(self.pred))
