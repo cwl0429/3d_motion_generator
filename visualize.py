@@ -52,10 +52,10 @@ class AnimePlot():
                 y = np.array([motion[i, pre_node, 1], motion[i, next_node, 1]])
                 z = np.array([motion[i, pre_node, 2], motion[i, next_node, 2]])
                 if chain in jointChain[-6:]:
-                    # right
+                    # left
                     self.ax[f].plot(x, y, z, color="#3498db")
                 else:
-                    #left
+                    # right
                     self.ax[f].plot(x, y, z, color="#e74c3c")
         self.time_text.set_text(str(i))
     
@@ -65,5 +65,6 @@ class AnimePlot():
         writergif = animation.PillowWriter(fps = self.fps)
         self.anime.save(f, writer=writergif)
         # writervideo = animation.FFMpegWriter(fps = 10)
-        # f = f"{self.save_path}.mp4"
-        # self.anime.save(f, writer=writervideo)
+        writervideo = animation.writers['ffmpeg'](fps = 10)
+        f = f"{self.save_path}.mp4"
+        self.anime.save(f, writer=writervideo)
