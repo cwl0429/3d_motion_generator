@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import ffmpy
 from processing import joint, jointChain
 
 class AnimePlot():
@@ -61,10 +62,12 @@ class AnimePlot():
     
     def animate(self):
         self.anime = animation.FuncAnimation(self.fig, self.ani_update, self.frame_num, interval=1,init_func=self.ani_init)
-        f = f"{self.save_path}.gif"
+        f_gif = f"{self.save_path}.gif"
         writergif = animation.PillowWriter(fps = self.fps)
-        self.anime.save(f, writer=writergif)
-        # writervideo = animation.FFMpegWriter(fps = 10)
-        writervideo = animation.writers['ffmpeg'](fps = 10)
-        f = f"{self.save_path}.mp4"
-        self.anime.save(f, writer=writervideo)
+        self.anime.save(f_gif, writer=writergif)
+        f_mp4 = f"{self.save_path}.mp4"
+        ff = ffmpy.FFmpeg(
+            inputs={f_gif: None},
+            outputs={f_mp4: ['-y']}
+        )
+        ff.run()

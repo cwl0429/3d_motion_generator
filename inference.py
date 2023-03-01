@@ -18,7 +18,7 @@ class Inference:
         TPose = pickle.load(fpick)[0]
 
     def __init__(self):
-        model_name = ['1011_V3_ChoreoMaster_Normal_train_angle_01_2010','1229_V3_ChoreoMaster_Normal_train_angle_01_2020',
+        model_name = ['0215_V3_ChoreoMaster_Normal_train_angle_01_0410','1229_V3_ChoreoMaster_Normal_train_angle_01_2020',
                         '1011_V3_ChoreoMaster_Normal_train_angle_01_2030','1229_V3_ChoreoMaster_Normal_train_angle_01_2045', 
                             '1011_V3_ChoreoMaster_Normal_train_angle_01_2060']
         model_loader = ModelLoader(model_name, self.DEVICE, self.part_list)
@@ -109,7 +109,7 @@ class Inference:
             pickle.dump(self.pred, fpick)
         if visual:
             figure = AnimePlot(5)
-            labels = ['Predicted', 'Ground Truth']
+            labels = ['Predicted', 'Original']
             figure.set_fig(labels, save_path)
             figure.set_data([self.pred, self.gt], len(self.pred))
             figure.animate()
